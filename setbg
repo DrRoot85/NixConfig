@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Pick an image using nsxiv
+selected_image=$(nsxiv -r -q -o ~/Pictures/MyWalls/"$1")
+SCRIPTSDIR="$HOME/.local/bin"
+ln_success=false
+
+
+# Check the value of $XDG_SESSION_DESKTOP and perform actions accordingly
+if [[ "$XDG_SESSION_DESKTOP" == "Hyprland" ]]; then
+	# swww img "$selected_image" && wal -i "$selected_image" -o ~/.local/bin/reload_dunst
+    swww query || swww-daemon --format xrgb && swww img  "$selected_image" --transition-type random --transition-fps 60 --transition-duration 1 --transition-bezier ".43,1.19,1,.4" && wal -i "$selected_image"
+    killall waybar
+    waybar &
+    sleep 1
+    #${SCRIPTSDIR}/walpath
+    ln -sf "$selected_image" "$HOME/.config/hypr/.current_wallpaper"
+    ln_success=true 
+    xrdb -load   ~/.Xresources
+    xrdb ~/.Xresources
+    xrdb -merge ~/.cache/wal/colors.Xresources
+elif [[ "$XDG_SESSION_TYPE" == "tty" ]]; then 
+	wal -i "$selected_image" -o ~/.local/bin/reload_dunst
+	xwallpaper --stretch "$selected_image"
+    sleep 1
+    xrdb -load   ~/.Xresources
+    xrdb ~/.Xresources
+    xrdb -merge ~/.cache/wal/colors.Xresources
+    sleep 0.5
+    # ${SCRIPTSDIR}/WallustSwww
+    #suckclean && sleep 5 &&  notify-send "All Done Restart Dwm Now"
+    # pkill dwm
+# else
+    # Add any other actions for different desktop environments here
+    # echo "Desktop environment is not Hyprland or dwm."
+fi

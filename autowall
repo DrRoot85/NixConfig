@@ -1,0 +1,38 @@
+#!/bin/sh
+
+SCRIPTSDIR="$HOME/.config/hypr/scripts"
+
+wal -i "$HOME/Pictures/MyWalls"
+
+ln_success=false
+
+
+# Check the value of $XDG_SESSION_DESKTOP and perform actions accordingly
+if [[ "$XDG_SESSION_DESKTOP" == "Hyprland" ]]; then
+	swww query || swww-daemon --format xrgb && swww img  "$(< "${HOME}/.cache/wal/wal")" --transition-type random --transition-fps 60 --transition-duration 1 --transition-bezier ".43,1.19,1,.4"
+	# wpg -Ti  "$(< "${HOME}/.cache/wal/wal")"
+    sleep 3
+    killall waybar
+    sleep 3
+    waybar &
+    sleep 3
+    ln -sf "$HOME/.cache/wal/currentwallpaper.png" "$HOME/.config/hypr/.current_wallpaper"
+    ln_success=true 
+     xrdb -load   ~/.Xresources
+     xrdb ~/.Xresources
+     xrdb -merge ~/.cache/wal/colors.Xresources
+elif [[ "$XDG_SESSION_TYPE" == "tty" ]]; then 
+	xargs xwallpaper --stretch < ~/.cache/wal/wal
+	# wpg -Ti  "$(< "${HOME}/.cache/wal/wal")"
+    sleep 1
+    xrdb -load   ~/.Xresources
+    xrdb ~/.Xresources
+    xrdb -merge ~/.cache/wal/colors.Xresources
+    sleep 0.5
+    #${SCRIPTSDIR}/WallustSwww
+    # suckclean && sleep 5 &&  notify-send "All Done Restart Dwm Now"
+    # pkill dwm
+# else
+    # Add any other actions for different desktop environments here
+    # echo "Desktop environment is not Hyprland or dwm."
+fi
